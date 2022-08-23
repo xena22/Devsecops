@@ -1,0 +1,66 @@
+/*
+	Surcharge des styles par défaut des composants Bootstrap
+*/
+
+.navbar {
+	background: #123069;
+	margin-bottom: 30px;
+}
+
+a {
+	color: #123069;
+}
+
+.navbar a.navbar-brand {
+	color: #FFF;
+}
+
+.navbar a.navbar-brand:hover {
+	color: #EEE;
+}
+
+.btn-primary {
+	background: #123069;
+	border: none
+}
+
+.btn-primary:hover {
+	background: #FFF;
+	color: #123069;
+	border: solid 1px #123069;
+}
+
+.navbar-light .navbar-nav .nav-link {
+	color: #FFF;
+}
+
+.navbar-light .navbar-nav .nav-link:hover {
+	color: #EEE;
+}
+
+.navbar-light .navbar-nav .active > .nav-link {
+	color: #FFF;
+}
+
+.navbar-light .navbar-nav .active > .nav-link:hover {
+	color: #EEE;
+}
+
+.list-group-item.active {
+	background: #123069;
+	border: none;	
+}
+
+.delete_acc {
+	margin-top: 10px;
+	text-align: center
+}
+
+.delete_acc button {
+	background: #d11100;
+}
+
+.delete_acc button:hover {
+	color: #d11100;
+	border: solid 1px #d11100;
+}
