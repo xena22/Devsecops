@@ -9,25 +9,25 @@ require_once('handler/user.php');
 // AUTHENTIFICATION --> Récupère les creds saisis par l'utilisateur pour établir leur conformité avec ce qui est présent en base de données
 function auth($pseudo, $password_typed)
 {
-	// Récupération des information utilisateur en fonction du pseudo saisi
-	$res = get_user_by_pseudo($pseudo);
-	
-	// Si pas de résultat, l'utilisateur n'existe pas donc l'authentification échoue
-	if (!$res)
-	{
-		die('Utilisateur n\'existe pas');
-	} else {
-		// Récupération du mot de passe en base de donnée pour comparaison avec ce qui a été saisi par l'utilisateur
-		$password_db = $res['password'];
-		
-		// Comparaison, si vraie retourne l'ID de l'utilisateur à authentifier, si faux l'authentification échoue
-		if ($password_typed == $password_db) {
-			return $res['id'];
-		} else {
-			die('Mauvais mot de passe');
-			return false;
-		}
-	}
+    // Récupération des information utilisateur en fonction du pseudo saisi
+    $res = get_user_by_pseudo($pseudo);
+   
+    // Si pas de résultat, l'utilisateur n'existe pas donc l'authentification échoue
+    if (!$res)
+    {
+        die('Utilisateur  inccorect');
+    } else {
+        // Récupération du mot de passe en base de donnée pour comparaison avec ce qui a été saisi par l'utilisateur
+        $password_db = $res[0]['password'];
+       
+        // Comparaison, si vraie retourne l'ID de l'utilisateur à authentifier, si faux l'authentification échoue
+        if ($password_typed == $password_db) {
+            return $res[0]['id'];
+        } else {
+            die('mot de passe');
+            return false;
+        }
+    }
 }
 
 // Si l'utilisateur est connecté, pas besoin de passer par le portail de login

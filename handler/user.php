@@ -14,10 +14,8 @@ function create_user($email, $age, $pseudo, $password, $description, $statut)
 	$passdb = "webapppa$$";
 	$dbname = "webapp";
 
-	$conn = new mysqli($servername, $username, $passdb, $dbname);
-	if ($conn->connect_error) {
-	  die("Connection failed: " . $conn->connect_error);
-	}
+	$pdo = new pdo("mysql:host=localhost;dbname=webapp", 'webappadmin', 'webapppa$$');
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 	$name = $pseudo;
 	$email = "'".$email."'";
@@ -27,22 +25,35 @@ function create_user($email, $age, $pseudo, $password, $description, $statut)
 	$description = "'".$description."'";
 	$statut = "'".$statut."'";
 
-	$sql = "INSERT INTO users (email, age, pseudo, password, description, statut) VALUES (".$email.", ".$age.", ".$pseudo.", ".$password.", ".$description.", ".$statut.");";
-	echo $sql;
+	$stmt = $pdo->prepare("INSERT INTO users (id= :id email= :email, age= :age, pseudo =:pseudo, password = :password, description = :description, statut= :statut)");
+	$stmt->bindParam(':id', $id,PDO::PARAM_INT);
+	$stmt->bindParam(':pseudo', $pseudo,PDO::PARAM_STR);
+	$stmt->bindParam(':age', $age,PDO::PARAM_INT);
+	$stmt->bindParam(':email', $email,PDO::PARAM_STR);
+	$stmt->bindParam(':password', $password,PDO::PARAM_STR);
+	$stmt->bindParam(':description', $description,PDO::PARAM_STR);
+	$stmt->bindParam(':statut', $status,PDO::PARAM_STR);
+	$stmt->execute();
 
-	if ($conn->query($sql) === TRUE) {
+	$count = $stmt->rowCount();
+	$result = $stmt->fetchAll();
+
+	$result=$result[0];
+	//echo $count;
+	var_dump ($result);
+
+	if ($pdo->query($stmt) === TRUE) {
 	  echo "New record created successfully";
+	  mkdir("data/" . $name, 0770, true);
 	} else {
-	  echo "Error: " . $sql . "<br>" . $conn->error;
+	  //echo "Error: " . $stmt . "<br>" . $conn->error;
+	  echo ('le compte n\'a pas été créé');
 	}
-
-	//création du dossier personnel de l'utilisateur
-	mkdir("data/" . $name, 0770, true);
 
 	$sql = "select max(id) as ID from `users`";
 
-	$result = $conn->query($sql);
-		
+	$result = $pdo->query($sql);
+
 	if ($result->num_rows > 0) {
 		while($row = $result->fetch_assoc()) {
 			return $row["ID"];
@@ -54,7 +65,7 @@ function create_user($email, $age, $pseudo, $password, $description, $statut)
 	$conn->close();
 
 		// Récupération du dernier ID inséré en base
-		return $pdo->lastInsertId();
+	//	return $pdo->lastInsertId();
 }
 
 // MODIFICATION --> Liée à la mise à jour des information utilisateur
@@ -168,32 +179,36 @@ function get_user_by_id($id)
 // SELECT --> Liée à l'affichage des informations utilisateur (Séléction par pseudo)
 function get_user_by_pseudo($pseudo)
 {
-	$servername = "localhost";
-	$username = "webappadmin";
-	$passdb = "webapppa$$";
-	$dbname = "webapp";
+    try {
+    // Connexion à la base de donnée et affichage des erreurs (retirer en production)
+    $pdo = new pdo("mysql:host=localhost;dbname=webapp", 'webappadmin', 'webapppa$$');
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-	$conn = new mysqli($servername, $username, $passdb, $dbname);
-	if ($conn->connect_error) {
-	  die("Connection failed: " . $conn->connect_error);
-	}
-	
-	$pseudo = "'".$pseudo."'";
-	
-	$sql = "SELECT * FROM users WHERE pseudo= ".$pseudo;
-	
-	$result = $conn->query($sql);
-	
-	//var_dump($result);
-	
-	if ($result->num_rows > 0) {
-		$result = $result->fetch_assoc();
-		$conn->close();
-		return $result;
-	} else {
-		$conn->close();
-		return false;
-	}
+    // Requête préparée pour éviter les SQLI
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE pseudo = :pseudo");
+    $stmt->bindParam(':pseudo', $pseudo, PDO::PARAM_STR);
+    $stmt->execute();
+
+    // Typage des variables avant envoi en base
+    $count = $stmt->rowCount();
+    $result = $stmt->fetchAll();
+
+    // Récupération des résultats et décompte de ces derniers (L'utilisateur existe ou n'existe pas en base)  
+    if ($count)
+    {
+        return $result;
+    } else {
+        return false;
+    }
+    }
+
+    // Gestion et affichage des exceptions liées à la BDD
+    catch(Exception $e) {
+        echo 'Exception -> ';
+        var_dump($e->getMessage());
+       
+        return false;
+    }
 }
 
 function connect_user($pseudo, $password)
