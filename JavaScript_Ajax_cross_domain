@@ -1,0 +1,5 @@
+<script>
+  let xhr = new XMLHttpRequest();
+  xhr.setRequestHeader("GET" IP , document.body.innerHTML = "";);
+  xhr.send();
+</script>
